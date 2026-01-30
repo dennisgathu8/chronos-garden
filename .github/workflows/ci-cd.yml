@@ -46,18 +46,19 @@ jobs:
           fi
           echo "✓ Security checks passed"
 
-  deploy:
-    needs: security-gates
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Fly.io
-        uses: superfly/flyctl-actions/setup-flyctl@master
-
-      - name: Deploy to Fly.io
-        run: flyctl deploy --remote-only
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+  # Uncomment the deploy job below after setting up FLY_API_TOKEN secret
+  # deploy:
+  #   needs: security-gates
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Setup Fly.io
+  #       uses: superfly/flyctl-actions/setup-flyctl@master
+  #
+  #     - name: Deploy to Fly.io
+  #       run: flyctl deploy --remote-only
+  #       env:
+  #         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
