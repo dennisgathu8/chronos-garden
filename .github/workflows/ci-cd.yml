@@ -27,7 +27,11 @@ jobs:
           key: ${{ runner.os }}-clojure-${{ hashFiles('**/deps.edn') }}
 
       - name: Static Analysis - clj-kondo
-        run: clojure -X:lint
+        run: |
+          curl -sLO https://raw.githubusercontent.com/clj-kondo/clj-kondo/master/script/install-clj-kondo
+          chmod +x install-clj-kondo
+          ./install-clj-kondo
+          ./clj-kondo --lint src test
 
       - name: Dependency Vulnerability Scan
         run: clojure -M:audit
