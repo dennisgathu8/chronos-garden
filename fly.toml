@@ -1,0 +1,32 @@
+app = "chronos-garden"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  JVM_OPTS = "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
+  SECRETS_PATH = "/run/secrets"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256
+
+[checks]
+  [checks.health]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    path = "/"
+    port = 8080
+    timeout = "3s"
+    type = "http"

@@ -1,0 +1,30 @@
+# Build artifacts
+target/
+.shadow-cljs/
+.cpcache/
+*.jar
+*.class
+
+# Dependencies
+node_modules/
+.m2/
+.gitlibs/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.lsp/
+.clj-kondo/.cache/
+
+# Environment
+.env
+.env.local
+secrets/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

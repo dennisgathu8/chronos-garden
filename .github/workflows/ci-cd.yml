@@ -1,0 +1,62 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  security-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Clojure
+        uses: DeLaGuardo/setup-clojure@12.5
+        with:
+          cli: 1.11.1.1429
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+          key: ${{ runner.os }}-clojure-${{ hashFiles('**/deps.edn') }}
+
+      - name: Static Analysis - clj-kondo
+        run: clj -M:lint
+
+      - name: Dependency Vulnerability Scan
+        run: clj -M:audit
+
+      - name: Security Pattern Check
+        run: |
+          echo "Checking for forbidden patterns..."
+          if grep -rn "resolve\|ns-resolve\|find-var" src/; then
+            echo "ERROR: Dynamic resolution detected"
+            exit 1
+          fi
+          if grep -rn "symbol.*str\|symbol.*join" src/; then
+            echo "ERROR: String-constructed symbols detected"
+            exit 1
+          fi
+          echo "✓ Security checks passed"
+
+  deploy:
+    needs: security-gates
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Fly.io
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Fly.io
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
