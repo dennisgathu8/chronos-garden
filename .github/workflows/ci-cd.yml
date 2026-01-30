@@ -27,7 +27,7 @@ jobs:
           key: ${{ runner.os }}-clojure-${{ hashFiles('**/deps.edn') }}
 
       - name: Static Analysis - clj-kondo
-        run: clj -M:lint
+        run: clj -X:lint
 
       - name: Dependency Vulnerability Scan
         run: clj -M:audit
